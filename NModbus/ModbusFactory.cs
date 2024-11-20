@@ -164,6 +164,24 @@ namespace NModbus
             return new ModbusSerialMaster(transport);
         }
 
+        public IModbusMaster CreateMasterCustom(Socket client, byte[] headOfFrame, byte sendTag, byte[] endOfFrame)
+        {
+            var adapter = new SocketAdapter(client);
+
+            var transport = new CustomModbusRtuTransport(adapter, this, Logger, headOfFrame, sendTag, endOfFrame);
+
+            return new ModbusSerialMaster(transport);
+        }
+
+        public IModbusMaster CreateMasterCustom(Socket client, byte[] headOfFrame, byte sendTag, int readCount)
+        {
+            var adapter = new SocketAdapter(client);
+
+            var transport = new CustomModbusRtuTransport(adapter, this, Logger, headOfFrame, sendTag, readCount);
+
+            return new ModbusSerialMaster(transport);
+        }
+
         public IModbusFunctionService GetFunctionService(byte functionCode)
         {
             return _functionServices.GetValueOrDefault(functionCode);

@@ -213,5 +213,74 @@ namespace NModbus.Utility
 
             return BitConverter.GetBytes(crc);
         }
+
+        public static byte XORRange(byte[] data)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data), "Input array cannot be null.");
+            }
+
+            var startIndex = 0;
+            var endIndex = data.Length - 1;
+
+            // Perform XOR operation on the specified range
+            byte xorValue = data[startIndex];
+            for (int i = startIndex + 1; i <= endIndex; i++)
+            {
+                xorValue ^= data[i];
+            }
+
+            return xorValue;
+        }
+
+        public static uint ComputeFCS(byte[] data)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data), "Input array cannot be null.");
+            }
+
+            // Compute CRC32
+            return ComputeCRC32(data);
+        }
+
+        private static uint ComputeCRC32(byte[] data)
+        {
+            uint[] table = InitializeCRC32Table();
+            uint crc = 0xFFFFFFFF;
+
+            foreach (byte b in data)
+            {
+                crc = (crc >> 8) ^ table[(crc ^ b) & 0xFF];
+            }
+
+            return ~crc;
+        }
+
+        private static uint[] InitializeCRC32Table()
+        {
+            uint[] table = new uint[256];
+            const uint polynomial = 0xEDB88320;
+
+            for (uint i = 0; i < 256; i++)
+            {
+                uint crc = i;
+                for (uint j = 8; j > 0; j--)
+                {
+                    if ((crc & 1) == 1)
+                    {
+                        crc = (crc >> 1) ^ polynomial;
+                    }
+                    else
+                    {
+                        crc >>= 1;
+                    }
+                }
+                table[i] = crc;
+            }
+
+            return table;
+        }
     }
 }

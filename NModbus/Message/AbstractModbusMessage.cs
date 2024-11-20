@@ -43,7 +43,7 @@ namespace NModbus.Message
             set => _messageImpl.SlaveAddress = value;
         }
 
-        public byte[] MessageFrame => _messageImpl.MessageFrame;
+        public virtual byte[] MessageFrame => _messageImpl.MessageFrame;
 
         public virtual byte[] ProtocolDataUnit => _messageImpl.ProtocolDataUnit;
 
@@ -51,7 +51,7 @@ namespace NModbus.Message
 
         internal ModbusMessageImpl MessageImpl => _messageImpl;
 
-        public void Initialize(byte[] frame)
+        public virtual void Initialize(byte[] frame)
         {
             if (frame.Length < MinimumFrameSize)
             {

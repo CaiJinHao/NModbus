@@ -126,6 +126,7 @@ namespace NModbus
 		/// <param name="startAddress">Address to begin writing values.</param>
 		/// <param name="data">Values to write.</param>
 		void WriteMultipleRegisters(byte slaveAddress, ushort startAddress, ushort[] data);
+		void WriteMultipleRegistersShort(byte slaveAddress, ushort startAddress, short[] data);
 
 		/// <summary>
 		///    Asynchronously writes a block of 1 to 123 contiguous registers.
@@ -202,5 +203,7 @@ namespace NModbus
 		/// <param name="request">The request.</param>
 		TResponse ExecuteCustomMessage<TResponse>(IModbusMessage request)
 				where TResponse : IModbusMessage, new();
-	}
+
+		short[] ReadHoldingRegistersShort(byte slaveAddress, ushort startAddress, ushort numberOfPoints);
+    }
 }

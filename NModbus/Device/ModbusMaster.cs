@@ -117,7 +117,20 @@ namespace NModbus.Device
 			return PerformReadRegisters(request);
 		}
 
-		/// <summary>
+        public short[] ReadHoldingRegistersShort(byte slaveAddress, ushort startAddress, ushort numberOfPoints)
+        {
+            ValidateNumberOfPoints("numberOfPoints", numberOfPoints, 125);
+
+            var request = new ReadHoldingInputRegistersRequest(
+                    ModbusFunctionCodes.ReadHoldingRegisters,
+                    slaveAddress,
+                    startAddress,
+                    numberOfPoints);
+
+            return PerformReadRegistersShort(request);
+        }
+
+        /// <summary>
 		///    Asynchronously reads contiguous block of holding registers.
 		/// </summary>
 		/// <param name="slaveAddress">Address of device to read values from.</param>
@@ -253,14 +266,26 @@ namespace NModbus.Device
 			Transport.UnicastMessage<WriteMultipleRegistersResponse>(request);
 		}
 
-		/// <summary>
-		///    Asynchronously writes a block of 1 to 123 contiguous registers.
-		/// </summary>
-		/// <param name="slaveAddress">Address of the device to write to.</param>
-		/// <param name="startAddress">Address to begin writing values.</param>
-		/// <param name="data">Values to write.</param>
-		/// <returns>A task that represents the asynchronous write operation.</returns>
-		public Task WriteMultipleRegistersAsync(byte slaveAddress, ushort startAddress, ushort[] data)
+        public void WriteMultipleRegistersShort(byte slaveAddress, ushort startAddress, short[] data)
+        {
+            ValidateData("data", data, 123);
+
+            var request = new MyWriteMultipleRegistersRequest(
+                    slaveAddress,
+                    startAddress,
+                    new MyRegisterCollection(data));
+
+            Transport.UnicastMessage<WriteMultipleRegistersResponse>(request);
+        }
+
+        /// <summary>
+        ///    Asynchronously writes a block of 1 to 123 contiguous registers.
+        /// </summary>
+        /// <param name="slaveAddress">Address of the device to write to.</param>
+        /// <param name="startAddress">Address to begin writing values.</param>
+        /// <param name="data">Values to write.</param>
+        /// <returns>A task that represents the asynchronous write operation.</returns>
+        public Task WriteMultipleRegistersAsync(byte slaveAddress, ushort startAddress, ushort[] data)
 		{
 			ValidateData("data", data, 123);
 
@@ -445,7 +470,15 @@ namespace NModbus.Device
 			return Task.Factory.StartNew(() => PerformReadDiscretes(request));
 		}
 
-		private ushort[] PerformReadRegisters(ReadHoldingInputRegistersRequest request)
+        private short[] PerformReadRegistersShort(ReadHoldingInputRegistersRequest request)
+        {
+            var response =
+                    Transport.UnicastMessage<MyReadHoldingInputRegistersResponse>(request);
+
+            return response.Data.Take(request.NumberOfPoints).ToArray();
+        }
+
+        private ushort[] PerformReadRegisters(ReadHoldingInputRegistersRequest request)
 		{
 			ReadHoldingInputRegistersResponse response =
 					Transport.UnicastMessage<ReadHoldingInputRegistersResponse>(request);
